@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2ight Barbershop</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0a0a0a;
+    --white: #f5f2ed;
+    --gold: #c9a96e;
+    --gold-light: #e8d5b0;
+    --gray: #2a2a2a;
+    --muted: #888;
+    --border: rgba(201,169,110,0.2);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* ── CURSOR ── */
+  body { cursor: none; }
+  #cursor {
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease;
+  }
+  #cursor-ring {
+    width: 32px; height: 32px;
+    border: 1px solid rgba(201,169,110,0.5);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.4s ease, width 0.3s ease, height 0.3s ease;
+  }
+  a, button, input, select { cursor: none; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    padding: 28px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 100;
+    background: linear-gradient(to bottom, rgba(10,10,10,0.9), transparent);
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--white);
+    text-decoration: none;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+  }
+  .nav-links a:hover { opacity: 1; color: var(--gold); }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    padding: 0 60px;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 80% at 70% 50%, rgba(201,169,110,0.06) 0%, transparent 70%),
+      linear-gradient(135deg, #0a0a0a 0%, #141414 50%, #0a0a0a 100%);
+  }
+
+  .hero-line {
+    position: absolute;
+    right: 180px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 50vh;
+    background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+    opacity: 0.3;
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse { 0%,100%{opacity:0.2} 50%{opacity:0.5} }
+
+  .hero-content { position: relative; max-width: 640px; }
+
+  .hero-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(64px, 9vw, 120px);
+    font-weight: 400;
+    line-height: 0.9;
+    letter-spacing: -0.01em;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.4s forwards;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .hero-sub {
+    margin-top: 32px;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    line-height: 1.8;
+    max-width: 360px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.6s forwards;
+  }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 48px;
+    padding: 16px 40px;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-family: 'Jost', sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.3s, color 0.3s;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.8s forwards;
+  }
+  .hero-cta:hover { background: var(--gold); color: var(--black); }
+  .hero-cta::after { content: '→'; transition: transform 0.3s; }
+  .hero-cta:hover::after { transform: translateX(4px); }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 48px;
+    left: 60px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+    opacity: 0;
+    animation: fadeUp 1s 1.2s forwards;
+  }
+  .scroll-line {
+    width: 40px; height: 1px;
+    background: var(--gold);
+    transform-origin: left;
+    animation: expandLine 1s 1.5s ease forwards;
+    transform: scaleX(0);
+  }
+  @keyframes expandLine { to { transform: scaleX(1); } }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(20px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  /* ── SERVICES ── */
+  #services {
+    padding: 120px 60px;
+    border-top: 1px solid var(--border);
+  }
+
+  .section-label {
+    font-size: 9px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 64px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    max-width: 120px;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+  }
+
+  .service-card {
+    background: var(--black);
+    padding: 48px 40px;
+    transition: background 0.4s;
+    position: relative;
+    overflow: hidden;
+  }
+  .service-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 2px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .service-card:hover::before { transform: scaleX(1); }
+  .service-card:hover { background: #111; }
+
+  .service-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 0.2em;
+    margin-bottom: 24px;
+    opacity: 0.6;
+  }
+
+  .service-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 400;
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+
+  .service-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.8;
+    letter-spacing: 0.05em;
+  }
+
+  .service-price {
+    margin-top: 32px;
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--gold);
+    font-weight: 400;
+  }
+
+  /* ── BOOKING ── */
+  #booking {
+    padding: 120px 60px;
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  .booking-intro h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(40px, 5vw, 64px);
+    font-weight: 400;
+    line-height: 1.1;
+    margin-top: 24px;
+    margin-bottom: 24px;
+  }
+
+  .booking-intro h2 em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .booking-intro p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.9;
+    letter-spacing: 0.05em;
+  }
+
+  .booking-form { display: flex; flex-direction: column; gap: 4px; }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+
+  .form-group { display: flex; flex-direction: column; }
+
+  .form-group label {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding: 16px 20px 8px;
+    background: var(--gray);
+  }
+
+  .form-group input,
+  .form-group select {
+    background: var(--gray);
+    border: none;
+    border-bottom: 1px solid transparent;
+    padding: 0 20px 16px;
+    color: var(--white);
+    font-family: 'Jost', sans-serif;
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    outline: none;
+    transition: border-color 0.3s;
+    -webkit-appearance: none;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus {
+    border-bottom-color: var(--gold);
+  }
+
+  .form-group select option { background: #222; }
+
+  .form-group.full { grid-column: 1 / -1; }
+
+  .submit-btn {
+    margin-top: 8px;
+    padding: 20px;
+    background: var(--gold);
+    color: var(--black);
+    border: none;
+    font-family: 'Jost', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    transition: background 0.3s, transform 0.2s;
+  }
+  .submit-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+  .submit-btn:active { transform: translateY(0); }
+
+  /* ── SUCCESS OVERLAY ── */
+  #success-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10,10,10,0.95);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 24px;
+    text-align: center;
+  }
+  #success-overlay.show { display: flex; }
+
+  .success-icon {
+    width: 64px; height: 64px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: var(--gold);
+    animation: scaleIn 0.5s ease;
+  }
+  @keyframes scaleIn { from{transform:scale(0.5);opacity:0} to{transform:scale(1);opacity:1} }
+
+  .success-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 40px;
+    font-weight: 400;
+  }
+
+  .success-msg {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    max-width: 320px;
+    line-height: 1.8;
+  }
+
+  .success-close {
+    margin-top: 16px;
+    padding: 12px 32px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    background: none;
+    font-family: 'Jost', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    transition: all 0.3s;
+  }
+  .success-close:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 48px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+  }
+
+  .footer-info {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-align: center;
+    line-height: 2;
+  }
+
+  .footer-copy {
+    font-size: 10px;
+    color: rgba(136,136,136,0.4);
+    letter-spacing: 0.15em;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    nav { padding: 24px 32px; }
+    .nav-links { display: none; }
+    #hero { padding: 0 32px; }
+    .hero-scroll { left: 32px; }
+    #services { padding: 80px 32px; }
+    .services-grid { grid-template-columns: 1fr; }
+    #booking { padding: 80px 32px; grid-template-columns: 1fr; gap: 48px; }
+    .form-row { grid-template-columns: 1fr; }
+    footer { padding: 32px; flex-direction: column; gap: 24px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">2ight</a>
+  <ul class="nav-links">
+    <li><a href="#services">Dịch Vụ</a></li>
+    <li><a href="#booking">Đặt Lịch</a></li>
+    <li><a href="tel:0388502585">0388 502 585</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-line"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Barbershop · Hồ Chí Minh</p>
+    <h1 class="hero-title">The Art<br>of <em>Craft</em></h1>
+    <p class="hero-sub">Không gian dành riêng cho những quý ông hiểu rằng vẻ ngoài là sự thể hiện của phong cách sống.</p>
+    <a href="#booking" class="hero-cta">Đặt Lịch Ngay</a>
+  </div>
+  <div class="hero-scroll">
+    <span class="scroll-line"></span>
+    Cuộn xuống
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-label">Dịch Vụ</div>
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-num">01</div>
+      <div class="service-name">Haircut</div>
+      <p class="service-desc">Cắt tóc tỉ mỉ, phù hợp mọi phong cách từ classic đến hiện đại.</p>
+      <div class="service-price">150.000 ₫</div>
+    </div>
+    <div class="service-card">
+      <div class="service-num">02</div>
+      <div class="service-name">Shave</div>
+      <p class="service-desc">Cạo râu sạch sẽ, nhẹ nhàng với dao và kỹ thuật chuẩn barber.</p>
+      <div class="service-price">80.000 ₫</div>
+    </div>
+    <div class="service-card">
+      <div class="service-num">03</div>
+      <div class="service-name">Hot Shave</div>
+      <p class="service-desc">Cạo râu nóng với khăn nóng và dầu dưỡng — thư giãn và mượt mà.</p>
+      <div class="service-price">130.000 ₫</div>
+    </div>
+    <div class="service-card">
+      <div class="service-num">04</div>
+      <div class="service-name">Cut & Shave</div>
+      <p class="service-desc">Combo cắt tóc và cạo râu — trọn vẹn trong một lần ghé thăm.</p>
+      <div class="service-price">200.000 ₫</div>
+    </div>
+    <div class="service-card">
+      <div class="service-num">05</div>
+      <div class="service-name">Cut & Hot Shave</div>
+      <p class="service-desc">Trải nghiệm đỉnh cao — cắt tóc kết hợp hot shave sang trọng.</p>
+      <div class="service-price">250.000 ₫</div>
+    </div>
+    <div class="service-card">
+      <div class="service-num">06</div>
+      <div class="service-name">Perm</div>
+      <p class="service-desc">Uốn tóc chuyên nghiệp, giữ nếp lâu và bảo vệ sợi tóc.</p>
+      <div class="service-price">400.000 – 600.000 ₫</div>
+    </div>
+    <div class="service-card">
+      <div class="service-num">07</div>
+      <div class="service-name">Down Perm</div>
+      <p class="service-desc">Uốn xuôi, làm thẳng và mềm mượt tóc theo phong cách Hàn Quốc.</p>
+      <div class="service-price">200.000 – 400.000 ₫</div>
+    </div>
+    <div class="service-card">
+      <div class="service-num">08</div>
+      <div class="service-name">Color</div>
+      <p class="service-desc">Nhuộm màu đa dạng — từ tông tự nhiên đến màu cá tính nổi bật.</p>
+      <div class="service-price">300.000 – 600.000 ₫</div>
+    </div>
+    <div class="service-card">
+      <div class="service-num">09</div>
+      <div class="service-name">Bleach</div>
+      <p class="service-desc">Tẩy tóc chuyên nghiệp, nền tảng cho mọi màu sáng và độc đáo.</p>
+      <div class="service-price">800.000 – 1.200.000 ₫</div>
+    </div>
+  </div>
+</section>
+
+<!-- BOOKING -->
+<section id="booking">
+  <div class="booking-intro">
+    <div class="section-label">Đặt Lịch</div>
+    <h2>Dành thời gian<br>cho <em>bản thân</em></h2>
+    <p>Điền thông tin để đặt lịch hẹn. Chúng tôi sẽ xác nhận qua điện thoại trong vòng 30 phút.</p>
+  </div>
+
+  <form class="booking-form" id="bookingForm">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Họ & Tên</label>
+        <input type="text" placeholder="Nguyễn Văn A" required>
+      </div>
+      <div class="form-group">
+        <label>Số Điện Thoại</label>
+        <input type="tel" placeholder="0901 234 567" required>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Dịch Vụ</label>
+        <select required>
+          <option value="" disabled selected>Chọn dịch vụ</option>
+          <option>Haircut — 150k</option>
+          <option>Shave — 80k</option>
+          <option>Hot Shave — 130k</option>
+          <option>Cut & Shave — 200k</option>
+          <option>Cut & Hot Shave — 250k</option>
+          <option>Perm — 400k–600k</option>
+          <option>Down Perm — 200k–400k</option>
+          <option>Color — 300k–600k</option>
+          <option>Bleach — 800k–1.200k</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Barber</label>
+        <select>
+          <option value="" disabled selected>Chọn thợ (tuỳ chọn)</option>
+          <option>Nhật Trí</option>
+          <option>Đình Bảo</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Ngày Hẹn</label>
+        <input type="date" required>
+      </div>
+      <div class="form-group">
+        <label>Giờ Hẹn</label>
+        <select required>
+          <option value="" disabled selected>Chọn giờ</option>
+          <option>09:00</option>
+          <option>09:30</option>
+          <option>10:00</option>
+          <option>10:30</option>
+          <option>11:00</option>
+          <option>14:00</option>
+          <option>14:30</option>
+          <option>15:00</option>
+          <option>15:30</option>
+          <option>16:00</option>
+          <option>16:30</option>
+          <option>17:00</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group full">
+        <label>Ghi Chú</label>
+        <input type="text" placeholder="Yêu cầu đặc biệt (nếu có)...">
+      </div>
+    </div>
+    <button type="submit" class="submit-btn">Xác Nhận Đặt Lịch</button>
+  </form>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">2ight</div>
+  <div class="footer-info">
+    345/86 Trần Hưng Đạo, Quận 1, Hồ Chí Minh<br>
+    0388 502 585 · Mở cửa: Thứ 2 – Chủ Nhật · 9:00 – 19:00
+  </div>
+  <div class="footer-copy">© 2025 2ight Barbershop</div>
+</footer>
+
+<!-- SUCCESS OVERLAY -->
+<div id="success-overlay">
+  <div class="success-icon">✓</div>
+  <h2 class="success-title">Đã Đặt Lịch!</h2>
+  <p class="success-msg">Chúng tôi sẽ gọi xác nhận trong vòng 30 phút. Hẹn gặp bạn sớm.</p>
+  <button class="success-close" onclick="document.getElementById('success-overlay').classList.remove('show')">Đóng</button>
+</div>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.transform = `translate(${mx - 4}px, ${my - 4}px)`;
+  });
+
+  function animateRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.transform = `translate(${rx - 16}px, ${ry - 16}px)`;
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button, input, select').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform += ' scale(2)';
+      ring.style.width = '48px'; ring.style.height = '48px';
+    });
+    el.addEventListener('mouseleave', () => {
+      ring.style.width = '32px'; ring.style.height = '32px';
+    });
+  });
+
+  // Set min date to today
+  const dateInput = document.querySelector('input[type="date"]');
+  const today = new Date().toISOString().split('T')[0];
+  dateInput.min = today;
+
+  // Form submit
+  document.getElementById('bookingForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    document.getElementById('success-overlay').classList.add('show');
+    this.reset();
+  });
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelector(a.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+</script>
+</body>
+</html>
