@@ -5,7 +5,6 @@ allowing customers to browse services and book appointments online.
 
 ## 🏪 About
 **Location:** 345/86 Tran Hung Dao, District 1, Ho Chi Minh City  
-**Live Site:** *(add link if deployed)*
 
 ## ✨ Features
 - View all barbershop services and pricing
